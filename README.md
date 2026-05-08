@@ -43,6 +43,7 @@ At startup, the application will:
 
 Endpoint:
 - `GET /movies/search?title=<movie-title>&page=1`
+- `GET /movies/by-imdb/<imdb-id>`
 
 Behavior:
 - Receives the movie title from the frontend.
@@ -79,6 +80,12 @@ Example response shape:
       }
    ]
 }
+```
+
+Example IMDb lookup request:
+
+```bash
+curl "http://localhost:8000/movies/by-imdb/tt0372784"
 ```
 
 ### Media Catalog CRUD API (Flask)

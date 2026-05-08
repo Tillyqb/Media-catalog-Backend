@@ -88,6 +88,29 @@ def search_movies() -> Any:
     )
 
 
+@app.get("/movies/by-imdb/<string:imdb_id>")
+def get_movie_by_imdb(imdb_id: str) -> Any:
+    """Fetch one detailed OMDb movie by IMDb id."""
+    normalized_id = imdb_id.strip()
+
+    if not normalized_id:
+        return jsonify({"detail": "imdb_id is required"}), 400
+    if not normalized_id.startswith("tt"):
+        return jsonify({"detail": "imdb_id must start with 'tt'"}), 400
+
+    try:
+        movie = OMDB_CLIENT.get_by_imdb_id(normalized_id)
+    except ValueError as exc:
+        message = str(exc)
+        if "Movie not found" in message:
+            return jsonify({"detail": "Movie not found"}), 404
+        return jsonify({"detail": message}), 400
+    except Exception as exc:
+        return jsonify({"detail": f"OMDb request failed: {exc}"}), 502
+
+    return jsonify(movie)
+
+
 @app.get("/media-items")
 def list_media_items() -> Any:
     """List stored media items with pagination and optional media_type filter."""
