@@ -30,7 +30,7 @@ A Python backend service for managing and cataloging media files.
 ### Running the Application
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+python main.py
 ```
 
 At startup, the application will:
@@ -79,6 +79,27 @@ Example response shape:
       }
    ]
 }
+```
+
+### Media Catalog CRUD API (Flask)
+
+Endpoints:
+- `GET /media-items?limit=100&offset=0&media_type=image`
+- `GET /media-items/<id>`
+- `POST /media-items`
+- `PUT /media-items/<id>` (or `PATCH /media-items/<id>`)
+- `DELETE /media-items/<id>`
+
+Example create request:
+
+```bash
+curl -X POST "http://localhost:8000/media-items" \
+   -H "Content-Type: application/json" \
+   -d '{
+      "title": "Batman Begins",
+      "file_path": "/mnt/media/movies/batman-begins.mp4",
+      "media_type": "movie"
+   }'
 ```
 
 ## Data Access Layer
@@ -147,7 +168,7 @@ pip install -r requirements.txt
 ### 3. Run manually for validation
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+python main.py
 ```
 
 ### 4. Run as a service (recommended)
@@ -163,7 +184,7 @@ After=network.target
 Type=simple
 User=pi
 WorkingDirectory=/home/pi/media-catalog-backend
-ExecStart=/home/pi/media-catalog-backend/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+ExecStart=/home/pi/media-catalog-backend/.venv/bin/python /home/pi/media-catalog-backend/main.py
 Environment=DB_HOST=127.0.0.1
 Environment=DB_PORT=3306
 Environment=DB_USER=media_user
