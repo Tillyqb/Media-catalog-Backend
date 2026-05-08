@@ -21,22 +21,65 @@ A Python backend service for managing and cataloging media files.
    pip install -r requirements.txt
    ```
 
+3. Create your local environment file:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` and set your real credentials and `OMDB_API_KEY`.
+
 ### Running the Application
 
 ```bash
-export DB_HOST=127.0.0.1
-export DB_PORT=3306
-export DB_USER=media_user
-export DB_PASSWORD=change_me
-export DB_NAME=media_catalog
-
-python main.py
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 At startup, the application will:
 - connect to MySQL,
 - create the configured database if it does not exist,
-- create a `media_items` table if it does not exist.
+- create a `media_items` table if it does not exist,
+- verify OMDb API key configuration.
+
+### Frontend Movie Search API
+
+Endpoint:
+- `GET /movies/search?title=<movie-title>&page=1`
+
+Behavior:
+- Receives the movie title from the frontend.
+- Calls OMDb search by title.
+- Fetches detailed fields per result by IMDb id.
+- Returns a list of detailed movie objects.
+
+Example request:
+
+```bash
+curl "http://localhost:8000/movies/search?title=batman&page=1"
+```
+
+Example response shape:
+
+```json
+{
+   "query": "batman",
+   "count": 10,
+   "results": [
+      {
+         "Title": "Batman Begins",
+         "Year": "2005",
+         "Rated": "PG-13",
+         "Released": "15 Jun 2005",
+         "Runtime": "140 min",
+         "Genre": "Action, Crime, Drama",
+         "Director": "Christopher Nolan",
+         "Actors": "Christian Bale, Michael Caine, Ken Watanabe",
+         "Plot": "After training with his mentor...",
+         "Poster": "https://...",
+         "imdbRating": "8.2",
+         "imdbID": "tt0372784"
+      }
+   ]
+}
+```
 
 ## Data Access Layer
 
@@ -104,13 +147,7 @@ pip install -r requirements.txt
 ### 3. Run manually for validation
 
 ```bash
-export DB_HOST=127.0.0.1
-export DB_PORT=3306
-export DB_USER=media_user
-export DB_PASSWORD=change_me
-export DB_NAME=media_catalog
-
-python main.py
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 ### 4. Run as a service (recommended)
@@ -126,12 +163,13 @@ After=network.target
 Type=simple
 User=pi
 WorkingDirectory=/home/pi/media-catalog-backend
-ExecStart=/home/pi/media-catalog-backend/.venv/bin/python /home/pi/media-catalog-backend/main.py
+ExecStart=/home/pi/media-catalog-backend/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
 Environment=DB_HOST=127.0.0.1
 Environment=DB_PORT=3306
 Environment=DB_USER=media_user
 Environment=DB_PASSWORD=change_me
 Environment=DB_NAME=media_catalog
+Environment=OMDB_API_KEY=your_omdb_api_key_here
 Restart=always
 RestartSec=5
 

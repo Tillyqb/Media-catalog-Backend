@@ -35,6 +35,24 @@ class OMDBClient:
             params["y"] = year
         return self._request(params)
 
+    def get_by_imdb_id(self, imdb_id: str) -> dict[str, Any]:
+        """Fetch full details for one IMDb id."""
+        return self._request({"i": imdb_id, "plot": "short"})
+
     def search(self, query: str, page: int = 1) -> dict[str, Any]:
         """Search movies by text query."""
         return self._request({"s": query, "page": page})
+
+    def search_with_details(self, query: str, page: int = 1) -> list[dict[str, Any]]:
+        """Search movies and hydrate each result with detailed OMDb fields."""
+        search_payload = self.search(query=query, page=page)
+        search_results = search_payload.get("Search", [])
+
+        detailed_results: list[dict[str, Any]] = []
+        for item in search_results:
+            imdb_id = item.get("imdbID")
+            if not imdb_id:
+                continue
+            detailed_results.append(self.get_by_imdb_id(imdb_id))
+
+        return detailed_results
