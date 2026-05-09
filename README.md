@@ -243,7 +243,10 @@ Add your code and update dependencies as needed.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 or later (GPL-3.0-or-later).
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
-See the full license text at:
+You may copy, modify, and redistribute this software under the terms of the GPL-3.0.
+Any distributed modifications must also remain under GPL-3.0.
+
+For full license terms, see the GNU license text at:
 https://www.gnu.org/licenses/gpl-3.0.en.html
